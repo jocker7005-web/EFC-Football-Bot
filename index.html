@@ -191,28 +191,49 @@
 
     </div>
 
-    <!-- Telegram Web App Avtomatik Ma'lumot Olish Kodi -->
+        <!-- Telegram Web App bilan tugmalarni to'liq bog'lash kodi -->
     <script>
-        // Telegram Web App-ni ishga tushirish
         const tg = Telegram.WebApp;
         tg.ready();
         tg.expand(); // Ekran oynasini to'liq tepagacha ochish
 
-        // Foydalanuvchi ma'lumotlarini o'rnatish
-        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-            const user = tg.initDataUnsafe.user;
-            
-            // Ism yoki usernameni chiqarish
-            document.getElementById('user-name').innerText = user.first_name || user.username || "Mijoz";
-            
-            // ID raqamini chiqarish
-            document.getElementById('user-id').innerText = "ID: " + user.id;
-            
-            // Avatar uchun birinchi harfni olish
-            if (user.first_name) {
-                document.getElementById('user-avatar').innerText = user.first_name.charAt(0).toUpperCase();
+        // Foydalanuvchi ma'lumotlarini Telegramdan olish va ekranga chiqarish
+        try {
+            if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                const user = tg.initDataUnsafe.user;
+                
+                // Ism yoki usernameni chiqarish
+                document.getElementById('user-name').innerText = user.first_name || user.username || "Mijoz";
+                
+                // ID raqamini chiqarish
+                document.getElementById('user-id').innerText = "ID: " + user.id;
+                
+                // Avatar ichidagi harf
+                if (user.first_name) {
+                    document.getElementById('user-avatar').innerText = user.first_name.charAt(0).toUpperCase();
+                }
+            } else {
+                // Agar Telegram ma'lumot bermasa (test rejimida)
+                document.getElementById('user-name').innerText = "eFootball Player";
+                document.getElementById('user-id').innerText = "ID: Faollashtirildi";
             }
+        } catch (e) {
+            document.getElementById('user-name').innerText = "eFootball Player";
         }
+
+        // Tugmalar bosilganda Telegram botga xabar yuborish mantiqlari
+        function sendAction(actionText) {
+            // Web App oynasini yopib, botga ma'lumot yuboradi
+            tg.sendData(actionText);
+            tg.close();
+        }
+
+        // HTML ichidagi tugmalarga funksiyani biriktiramiz
+        document.querySelector("button[onclick*='open_deposit']").setAttribute("onclick", "sendAction('open_deposit')");
+        document.querySelector("div[onclick*='open_wheel']").setAttribute("onclick", "sendAction('open_wheel')");
+        document.querySelector("div[onclick*='open_1vs1']").setAttribute("onclick", "sendAction('open_1vs1')");
+        document.querySelector("div[onclick*='open_p2p']").setAttribute("onclick", "sendAction('open_p2p')");
+        document.querySelector("button[onclick*='buy_vip_ticket']").setAttribute("onclick", "sendAction('buy_vip_ticket')");
     </script>
 </body>
 </html>
