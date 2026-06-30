@@ -1,92 +1,21 @@
-import asyncio
-import sqlite3
-import logging
-from aiogram import Bot, Dispatcher, types, F
-from aiogram.filters import Command, CommandStart
-from aiogram.client.session.aiohttp import AiohttpSession
-from aiohttp import ClientTimeout
+import os
+import telebot
 
-# Loglarni yoqish (xatolarni aniqroq ko'rish uchun)
-logging.basicConfig(level=logging.INFO)
+# BotFather'dan olingan token
+BOT_TOKEN = "8758382660:AAFNG9Q4v6BZQv0OqU02oMuc8g12hTZxq7M"
+bot = telebot.TeleBot(BOT_TOKEN)
 
-TOKEN = "8758382660:AAFNG9Q4v6BZQv0OqU02oMuc8g12hTZxq7M"
-ADMIN_ID = 1678146043
-REVIEW_CHANNEL = -1001908315496
-CARD_DETAILS = "9860 3501 0897 5409 Xusanova M"
-MIN_LIMIT = 10000 
+# Foydalanuvchi /start buyrug'ini bosganda ishlaydi
+@bot.message_handler(commands=['start'])
+def send_welcome(message):
+    welcome_text = (
+        "Assalomu alaykum! EFC-Futbol-Bot muvaffaqiyatli ishga tushdi! ⚽🤖\n\n"
+        "Siz /start tugmasini bosdingiz. Bot endi xabarlaringizni qabul qilishga tayyor!"
+    )
+    bot.reply_to(message, welcome_text)
 
-# Ulanishni barqarorlashtirish sozlamalari
-# Timeoutni 60 soniyaga uzaytiramiz (Request timeout xatosini kamaytiradi)
-session = AiohttpSession(timeout=ClientTimeout(total=60))
-bot = Bot(token=TOKEN, session=session)
-dp = Dispatcher()
-
-# DATABASE
-def init_db():
-    conn = sqlite3.connect('database.db')
-    cursor = conn.cursor()
-    cursor.execute('''CREATE TABLE IF NOT EXISTS users (
-                        user_id INTEGER PRIMARY KEY, 
-                        efc_balance INTEGER DEFAULT 0,
-                        som_balance INTEGER DEFAULT 0)''')
-    conn.commit()
-    conn.close()
-
-# YECHISH
-@dp.message(Command("withdraw"))
-async def withdraw_request(message: types.Message):
-    conn = sqlite3.connect('database.db')
-    cursor = conn.cursor()
-    cursor.execute('SELECT som_balance FROM users WHERE user_id = ?', (message.from_user.id,))
-    row = cursor.fetchone()
-    som = row[0] if row else 0
-    conn.close()
-
-    if som < MIN_LIMIT:
-        await message.answer(f"❌ Yechish uchun kamida {MIN_LIMIT} UZS bo'lishi kerak. Sizda: {som} UZS.")
-    else:
-        await bot.send_message(REVIEW_CHANNEL, f"📩 YECHISH SO'ROVI!\n\n👤 User ID: {message.from_user.id}\n💰 Summa: {som} UZS\n💳 Karta: {CARD_DETAILS}")
-        await message.answer("✅ Yechish so'rovingiz adminlarga yuborildi!")
-
-# ADMIN
-@dp.message(F.text.startswith("/add_som"))
-async def add_som(message: types.Message):
-    if message.from_user.id != ADMIN_ID: return
-    try:
-        parts = message.text.split()
-        target_id = int(parts[1])
-        amount = int(parts[2])
-        conn = sqlite3.connect('database.db')
-        cursor = conn.cursor()
-        cursor.execute('UPDATE users SET som_balance = som_balance + ? WHERE user_id = ?', (amount, target_id))
-        conn.commit()
-        conn.close()
-        await message.answer(f"✅ User {target_id} balansiga {amount} UZS qo'shildi.")
-    except:
-        await message.answer("Format: /add_som [ID] [SUMMA]")
-
-# BALANS
-@dp.message(Command("balance"))
-async def show_balance(message: types.Message):
-    conn = sqlite3.connect('database.db')
-    cursor = conn.cursor()
-    cursor.execute('SELECT efc_balance, som_balance FROM users WHERE user_id = ?', (message.from_user.id,))
-    row = cursor.fetchone()
-    conn.close()
-    efc = row[0] if row else 0
-    som = row[1] if row else 0
-    await message.answer(f"💰 Balansingiz:\n\nEFC Ball: {efc}\nReal Pul: {som} UZS")
-
-# START
-@dp.message(CommandStart())
-async def cmd_start(message: types.Message):
-    await message.answer("Assalomu alaykum! Bot ishga tushdi. ✅")
-
-async def main():
-    init_db()
-    # pollingni ishga tushirish
-    await dp.start_polling(bot)
-
+# Botni doimiy aloqa (polling) rejimida ushlab turish
 if __name__ == "__main__":
-    asyncio.run(main())
+    print("Bot muvaffaqiyatli ishga tushirildi...")
+    bot.infinity_polling()
     
