@@ -9,37 +9,29 @@ from database import init_db, async_session, User
 BOT_TOKEN = "8758382660:AAFNG9Q4v6BZQv0OqU02oMuc8g12hTZxq7M"
 ADMIN_ID = 1678146043
 
+# Sizning aniq, to'g'ri sozlangan GitHub Pages havolangiz:
+WEB_APP_URL = "https://jocker7005-web.github.io/EFC-Football-Bot"
+
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
 
 @dp.message(Command("start"))
 async def start_cmd(message: types.Message):
-    async with async_session() as session:
-        async with session.begin():
-            pass
-    
-    # Render hostingingiz o'z havolasini avtomatik aniqlaydi
-    render_url = f"https://{os.environ.get('RENDER_EXTERNAL_HOSTNAME', '://onrender.com')}/"
-    
     kb = InlineKeyboardBuilder()
-    kb.button(text="🎮 O'yinni boshlash", web_app=types.WebAppInfo(url=render_url))
+    kb.button(text="🎮 O'yinni boshlash", web_app=types.WebAppInfo(url=WEB_APP_URL))
     await message.answer("Xush kelibsiz!", reply_markup=kb.as_markup())
 
-# Render internetga index.html faylini Mini App ko'rinishida chiqaradi
 async def handle_web(request):
-    if os.path.exists("index.html"):
-        with open("index.html", "r", encoding="utf-8") as f:
-            return web.Response(text=f.read(), content_type="text/html")
-    return web.Response(text="Mini App fayli topilmadi!")
+    return web.Response(text="OK")
 
 async def main():
     await init_db()
-    render_url = f"https://{os.environ.get('RENDER_EXTERNAL_HOSTNAME', '://onrender.com')}/"
     try:
+        # Doimiy ko'k oynachaga aniq to'g'ri havolani bog'laymiz
         await bot.set_chat_menu_button(
             menu_button=types.MenuButtonWebApp(
                 text="🎮 O'yin",
-                web_app=types.WebAppInfo(url=render_url)
+                web_app=types.WebAppInfo(url=WEB_APP_URL)
             )
         )
     except:
