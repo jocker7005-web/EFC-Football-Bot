@@ -4,7 +4,7 @@ from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import Command, CommandStart
 
 # SIZ BERGAN MA'LUMOTLAR BILAN
-TOKEN = "8758382660:AAGeaXpafGCFooWtdAHwLogopvqKLWKI6IM"
+TOKEN = "8758382660:AAFNG9Q4v6BZQv0OqU02oMuc8g12hTZxq7M"
 ADMIN_ID = 1678146043
 REVIEW_CHANNEL = -1001908315496
 CARD_DETAILS = "9860 3501 0897 5409 Xusanova M"
