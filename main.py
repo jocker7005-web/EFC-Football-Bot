@@ -86,11 +86,22 @@ async def spin_wheel(callback: types.CallbackQuery):
     await callback.message.answer(f"🎡 G'ildirak aylandi.\n\nYutuq: {reward}")
     await callback.answer()
 
-async def handle_web(request): return web.Response(text="Bot ishlamoqda!")
+async def handle_web(request): 
+    return web.Response(text="Bot ishlamoqda!")
+
 async def main():
     await init_db()
-    app = web.Application(); app.router.add_get('/', handle_web)
-    runner = web.AppRunner(app); await runner.setup()
+    web_app_url = "https://github.io"
+    await bot.set_chat_menu_button(
+        menu_button=types.MenuButtonWebApp(
+            text="🎮 O'yin", 
+            web_app=types.WebAppInfo(url=web_app_url)
+        )
+    )
+    app = web.Application()
+    app.router.add_get('/', handle_web)
+    runner = web.AppRunner(app)
+    await runner.setup()
     await web.TCPSite(runner, '0.0.0.0', int(os.environ.get("PORT", 10000))).start()
     await dp.start_polling(bot)
 
