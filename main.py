@@ -1,4 +1,6 @@
-import asyncio, random, os
+import asyncio
+import random
+import os
 from aiohttp import web
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import Command
@@ -10,6 +12,7 @@ BOT_TOKEN = "8758382660:AAFNG9Q4v6BZQv0OqU02oMuc8g12hTZxq7M"
 ADMIN_ID = 1678146043
 KANAL_ID = -1001908315496
 KARTA_RAQAM = "9860 3501 0897 5409 Xusanova M"
+WEB_APP_URL = "https://github.io"
 
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
@@ -23,7 +26,7 @@ async def start_cmd(message: types.Message):
             if not res.scalar_one_or_none():
                 session.add(User(telegram_id=message.from_user.id, username=message.from_user.username or "Noma'lum"))
     kb = InlineKeyboardBuilder()
-    kb.button(text="🎮 O'yinni boshlash (Web App)", web_app=types.WebAppInfo(url="https://google.com"))
+    kb.button(text="🎮 O'yinni boshlash (Web App)", web_app=types.WebAppInfo(url=WEB_APP_URL))
     kb.button(text="💳 Balansni to'ldirish", callback_data="deposit_info")
     kb.button(text="🎡 Omad G'ildiragi", callback_data="spin_wheel")
     await message.answer("Xush kelibsiz! eFootball Web App botiga xush kelibsiz.", reply_markup=kb.as_markup())
@@ -37,7 +40,10 @@ async def deposit_info(callback: types.CallbackQuery):
 async def handle_screenshot(message: types.Message):
     async with async_session() as session:
         new_order = DepositOrder(user_telegram_id=message.from_user.id, username=message.from_user.username or "Noma'lum", amount=0.0, file_id=message.photo[-1].file_id)
-        session.add(new_order); await session.flush(); order_id = new_order.id; await session.commit()
+        session.add(new_order)
+        await session.flush()
+        order_id = new_order.id
+        await session.commit()
     kb = InlineKeyboardBuilder()
     kb.button(text="✅ Qabul qilish", callback_data=f"approve_{order_id}")
     kb.button(text="❌ Rad etish", callback_data=f"reject_{order_id}")
@@ -46,28 +52,32 @@ async def handle_screenshot(message: types.Message):
 
 @dp.callback_query(F.data.startswith("approve_"))
 async def approve_order(callback: types.CallbackQuery):
-    order_id = int(callback.data.split("_")[1])
+    order_id = int(callback.data.split("_"))
     async with async_session() as session:
         async with session.begin():
             order = await session.get(DepositOrder, order_id)
             if order and order.status == "pending":
                 order.status = "approved"
-                try: await bot.send_message(chat_id=order.user_telegram_id, text=f"Sizning #{order_id} buyurtmangiz muvaffaqiyatli bajarildi!")
-                except: pass
+                try:
+                    await bot.send_message(chat_id=order.user_telegram_id, text=f"Sizning #{order_id} buyurtmangiz muvaffaqiyatli bajarildi!")
+                except:
+                    pass
                 await callback.message.edit_caption(caption=f"✅ Buyurtma #{order_id} tasdiqlandi!")
         await session.commit()
     await callback.answer()
 
 @dp.callback_query(F.data.startswith("reject_"))
 async def reject_order(callback: types.CallbackQuery):
-    order_id = int(callback.data.split("_")[1])
+    order_id = int(callback.data.split("_"))
     async with async_session() as session:
         async with session.begin():
             order = await session.get(DepositOrder, order_id)
             if order and order.status == "pending":
                 order.status = "rejected"
-                try: await bot.send_message(chat_id=order.user_telegram_id, text="Xatolik aniqlandi. Admin bilan bog'laning.")
-                except: pass
+                try:
+                    await bot.send_message(chat_id=order.user_telegram_id, text="Xatolik aniqlandi. Admin bilan bog'laning.")
+                except:
+                    pass
                 await callback.message.edit_caption(caption=f"❌ Buyurtma #{order_id} rad etildi!")
         await session.commit()
     await callback.answer()
@@ -77,27 +87,36 @@ async def spin_wheel(callback: types.CallbackQuery):
     async with async_session() as session:
         async with session.begin():
             counter = await session.get(GlobalSetting, "wheel_counter")
-            counter.value += 1; current_spin = counter.value
-            if current_spin == 60000: reward = "🎉 2000 COIN!"; counter.value = 0
-            elif current_spin % 30000 == 0: reward = "🎁 130 COIN!"
-            elif current_spin % 15000 == 0: reward = "🔥 250 EFC!"
-            else: reward = random.choice(["1 EFC", "10 EFC", "50 EFC", "Yutqazdingiz"])
+            counter.value += 1
+            current_spin = counter.value
+            if current_spin == 60000:
+                reward = "🎉 2000 COIN!"
+                counter.value = 0
+            elif current_spin % 30000 == 0:
+                reward = "🎁 130 COIN!"
+            elif current_spin % 15000 == 0:
+                reward = "🔥 250 EFC!"
+            else:
+                reward = random.choice(["1 EFC", "10 EFC", "50 EFC", "Yutqazdingiz"])
         await session.commit()
     await callback.message.answer(f"🎡 G'ildirak aylandi.\n\nYutuq: {reward}")
     await callback.answer()
 
-async def handle_web(request): 
+async def handle_web(request):
     return web.Response(text="Bot ishlamoqda!")
 
 async def main():
     await init_db()
-    web_app_url = "https://github.io"
-    await bot.set_chat_menu_button(
-        menu_button=types.MenuButtonWebApp(
-            text="🎮 O'yin", 
-            web_app=types.WebAppInfo(url=web_app_url)
+    try:
+        await bot.set_chat_menu_button(
+            menu_button=types.MenuButtonWebApp(
+                text="🎮 O'yin",
+                web_app=types.WebAppInfo(url=WEB_APP_URL)
+            )
         )
-    )
+    except Exception as e:
+        print(f"Ko'k tugmani sozlashda xato: {e}")
+        
     app = web.Application()
     app.router.add_get('/', handle_web)
     runner = web.AppRunner(app)
@@ -105,5 +124,6 @@ async def main():
     await web.TCPSite(runner, '0.0.0.0', int(os.environ.get("PORT", 10000))).start()
     await dp.start_polling(bot)
 
-if __name__ == "__main__": asyncio.run(main())
+if __name__ == "__main__":
+    asyncio.run(main())
     
