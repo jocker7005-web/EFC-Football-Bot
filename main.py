@@ -9,7 +9,7 @@ from aiohttp import ClientTimeout
 # Loglarni yoqish (xatolarni aniqroq ko'rish uchun)
 logging.basicConfig(level=logging.INFO)
 
-TOKEN = "8758382660:AAGeaXpafGCFooWtdAHwLogopvqKLWKI6IM"
+TOKEN = "8758382660:AAFNG9Q4v6BZQv0OqU02oMuc8g12hTZxq7M"
 ADMIN_ID = 1678146043
 REVIEW_CHANNEL = -1001908315496
 CARD_DETAILS = "9860 3501 0897 5409 Xusanova M"
