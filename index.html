@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EFC Football Game</title>
+    <script src="https://telegram.org"></script>
+    <style>
+        body {
+            background-color: #0b0e14;
+            color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 12px;
+            padding-bottom: 80px;
+            user-select: none;
+        }
+        .header-profile {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+            margin-bottom: 15px;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .avatar {
+            width: 36px;
+            height: 36px;
+            background-color: #1e2530;
+            border: 2px solid #e74c3c;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #e74c3c;
+        }
+        .username-container {
+            display: flex;
+            flex-direction: column;
+        }
+        .username {
+            font-size: 15px;
+            font-weight: 600;
+        }
+        .user-id {
+            font-size: 11px;
+            color: #7f8c8d;
+        }
+        .level-badge {
+            color: #e74c3c;
+            font-weight: bold;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Profil qismi -->
+    <div class="header-profile">
+        <div class="user-info">
+            <div class="avatar" id="user-avatar">U</div>
+            <div class="username-container">
+                <span class="username" id="user-name">Yuklanmoqda...</span>
+                <span class="user-id" id="user-id">ID: 000000</span>
+            </div>
+        </div>
+        <div class="level-badge">eFootball Level</div>
+    </div>
+      <!-- Hamyon va Balans bo'limi -->
+    <div style="background-color: #121620; border-radius: 12px; padding: 15px; margin-bottom: 15px; position: relative;">
+        <div style="color: #7f8c8d; font-size: 11px; margin-bottom: 5px;">Umumiy balans</div>
+        
+        <!-- So'm Balansi -->
+        <div style="font-size: 24px; font-weight: bold; margin-bottom: 2px;" id="som-balans">0.00</div>
+        <div style="background-color: #1e2530; display: inline-flex; align-items: center; gap: 5px; padding: 3px 8px; border-radius: 6px; font-size: 11px; color: #7f8c8d; margin-bottom: 15px;">
+            💵 SO'M hamyon
+        </div>
+
+        <!-- EFC Balansi -->
+        <div style="font-size: 24px; font-weight: bold; margin-bottom: 2px;" id="efc-balans">0.00</div>
+        <div style="background-color: #1e2530; display: inline-flex; align-items: center; gap: 5px; padding: 3px 8px; border-radius: 6px; font-size: 11px; color: #7f8c8d;">
+            🟡 eFootball Coin (EFC)
+        </div>
+
+        <!-- Qizil To'ldirish Tugmasi -->
+        <button onclick="Telegram.WebApp.sendData('open_deposit')" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); background-color: #e74c3c; color: white; border: none; padding: 10px 18px; font-size: 14px; font-weight: bold; border-radius: 20px; cursor: pointer;">
+            To'ldirish &gt;
+        </button>
+    </div>
+
+    <!-- EFootball 2026 Coin Harid Qilish Reklama Banneri -->
+    <div style="background-color: #121620; border-radius: 12px; padding: 15px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between;">
+        <div>
+            <div style="font-size: 15px; font-weight: bold; margin-bottom: 10px; width: 180px;">eFootball 2026 uchun coinlar harid qiling!</div>
+            <button onclick="Telegram.WebApp.sendData('buy_coins_banner')" style="background-color: #ffffff; color: #000000; border: none; padding: 8px 16px; font-size: 13px; font-weight: bold; border-radius: 6px; cursor: pointer;">
+                Harid Qilish
+            </button>
+        </div>
+        <div style="font-size: 45px; opacity: 0.8;">⚽</div>
+    </div>
+      <!-- O'yinlar va Bo'limlar sarlavhasi -->
+    <div style="font-size: 16px; font-weight: bold; margin-bottom: 12px; padding-left: 2px;">
+        O'yinlar va Bo'limlar
+    </div>
+
+    <!-- Uchta asosiy bo'lim tugmalari (Setka ko'rinishida) -->
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 25px;">
+        
+        <!-- Omad G'ildiragi -->
+        <div onclick="Telegram.WebApp.sendData('open_wheel')" style="background-color: #121620; border-radius: 10px; padding: 15px 5px; text-align: center; cursor: pointer; border: 1px solid #1f2633;">
+            <div style="font-size: 20px; margin-bottom: 8px;">🎡</div>
+            <div style="font-size: 11px; color: #b3b9c4; font-weight: 500;">Omad G'ildiragi</div>
+        </div>
+
+        <!-- 1vs1 Match -->
+        <div onclick="Telegram.WebApp.sendData('open_1vs1')" style="background-color: #121620; border-radius: 10px; padding: 15px 5px; text-align: center; cursor: pointer; border: 1px solid #1f2633;">
+            <div style="font-size: 20px; margin-bottom: 8px;">⚔️</div>
+            <div style="font-size: 11px; color: #b3b9c4; font-weight: 500;">1vs1 Match</div>
+        </div>
+
+        <!-- P2P Birja -->
+        <div onclick="Telegram.WebApp.sendData('open_p2p')" style="background-color: #121620; border-radius: 10px; padding: 15px 5px; text-align: center; cursor: pointer; border: 1px solid #1f2633;">
+            <div style="font-size: 20px; margin-bottom: 8px;">📊</div>
+            <div style="font-size: 11px; color: #b3b9c4; font-weight: 500;">P2P Birja</div>
+        </div>
+
+    </div>
+      <!-- VIP Karta Eksklyuziv sarlavhasi -->
+    <div style="font-size: 16px; font-weight: bold; margin-bottom: 12px; padding-left: 2px;">
+        VIP Karta Eksklyuziv
+    </div>
+
+    <!-- VIP Maqom Kartasi bloki -->
+    <div style="background-color: #121620; border: 1px solid #2a1f4d; border-radius: 14px; padding: 15px; margin-bottom: 25px; position: relative; overflow: hidden;">
+        <!-- Yon tomondagi binafsha rangli chiziq effekti uchun -->
+        <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: linear-gradient(to bottom, #8e44ad, #3498db);"></div>
+        
+        <div style="padding-left: 5px;">
+            <!-- Olov ikonkasi va Sarlavha -->
+            <div style="color: #f1c40f; font-size: 15px; font-weight: bold; margin-bottom: 8px; display: flex; align-items: center; gap: 5px;">
+                🔥 VIP Maqom Kartasi
+            </div>
+            
+            <!-- Matn qismi -->
+            <div style="font-size: 11px; color: #a6ae75; line-height: 1.4; width: 190px; margin-bottom: 12px;">
+                Jami faqat 64 ta karta sotiladi. Cheksiz imkoniyatlarga ega bo'ling!
+            </div>
+            
+            <!-- Narxi -->
+            <div style="font-size: 13px; font-weight: 500; color: #ffffff;">
+                Narxi: <span style="font-weight: bold;">500 EFC</span>
+            </div>
+        </div>
+
+        <!-- Sariq rangli Sotib olish tugmasi -->
+        <button onclick="Telegram.WebApp.sendData('buy_vip_ticket')" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); background-color: #f39c12; color: #000000; border: none; padding: 10px 20px; font-size: 13px; font-weight: bold; border-radius: 20px; cursor: pointer;">
+            Sotib olish
+        </button>
+    </div>
+      <!-- Pastki Navigatsiya Menyusi -->
+    <div style="position: fixed; bottom: 0; left: 0; right: 0; background-color: #0e121a; border-top: 1px solid #1f2633; display: grid; grid-template-columns: repeat(4, 1fr); padding: 8px 0; text-align: center; z-index: 1000;">
+        
+        <!-- Bosh sahifa (Aktiv holatda) -->
+        <div onclick="Telegram.WebApp.sendData('nav_home')" style="cursor: pointer; color: #e74c3c;">
+            <div style="font-size: 18px; margin-bottom: 2px;">🏠</div>
+            <div style="font-size: 10px; font-weight: 500;">Bosh sahifa</div>
+        </div>
+
+        <!-- G'ildirak -->
+        <div onclick="Telegram.WebApp.sendData('open_wheel')" style="cursor: pointer; color: #7f8c8d;">
+            <div style="font-size: 18px; margin-bottom: 2px;">🎡</div>
+            <div style="font-size: 10px; font-weight: 500;">G'ildirak</div>
+        </div>
+
+        <!-- Matchlar -->
+        <div onclick="Telegram.WebApp.sendData('open_1vs1')" style="cursor: pointer; color: #7f8c8d;">
+            <div style="font-size: 18px; margin-bottom: 2px;">⚔️</div>
+            <div style="font-size: 10px; font-weight: 500;">Matchlar</div>
+        </div>
+
+        <!-- Profil -->
+        <div onclick="Telegram.WebApp.sendData('nav_profile')" style="cursor: pointer; color: #7f8c8d;">
+            <div style="font-size: 18px; margin-bottom: 2px;">👤</div>
+            <div style="font-size: 10px; font-weight: 500;">Profil</div>
+        </div>
+
+    </div>
+
+    <!-- Telegram Web App Avtomatik Ma'lumot Olish Kodi -->
+    <script>
+        // Telegram Web App-ni ishga tushirish
+        const tg = Telegram.WebApp;
+        tg.ready();
+        tg.expand(); // Ekran oynasini to'liq tepagacha ochish
+
+        // Foydalanuvchi ma'lumotlarini o'rnatish
+        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+            const user = tg.initDataUnsafe.user;
+            
+            // Ism yoki usernameni chiqarish
+            document.getElementById('user-name').innerText = user.first_name || user.username || "Mijoz";
+            
+            // ID raqamini chiqarish
+            document.getElementById('user-id').innerText = "ID: " + user.id;
+            
+            // Avatar uchun birinchi harfni olish
+            if (user.first_name) {
+                document.getElementById('user-avatar').innerText = user.first_name.charAt(0).toUpperCase();
+            }
+        }
+    </script>
+</body>
+</html>
