@@ -1,20 +1,18 @@
 import asyncio
-import sqlite3
 import os
+import sqlite3
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import Command, CommandStart
 from aiohttp import web
 
-# TOKENni Render'dagi Environment Variables'dan oladi
-TOKEN = os.getenv("8758382660:AAFNG9Q4v6BZQv0OqU02oMuc8g12hTZxq7M") 
-ADMIN_ID = 1678146043
-REVIEW_CHANNEL = -1001908315496
-CARD_DETAILS = "9860 3501 0897 5409 Xusanova M"
-MIN_LIMIT = 10000 
+# TOKENni Render'dagi Environment Variables'dan avtomatik oladi
+TOKEN = os.getenv("TOKEN") 
+PORT = int(os.environ.get("PORT", 10000)) # Render bergan portni oladi
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
+# Bazani sozlash
 def init_db():
     conn = sqlite3.connect('database.db')
     cursor = conn.cursor()
@@ -25,30 +23,29 @@ def init_db():
     conn.commit()
     conn.close()
 
-# Bot buyruqlari...
 @dp.message(CommandStart())
 async def cmd_start(message: types.Message):
-    await message.answer("Bot Render'da ishga tushdi! ✅")
+    await message.answer("Bot Render'da muvaffaqiyatli ishga tushdi! ✅")
 
-# ... (qolgan funksiyalaringizni shu yerga qo'shing) ...
+# ... (boshqa kodlaringizni shu yerga qo'ying) ...
 
-# Render uchun kerakli portni tinglovchi web server
+# Render uchun kichik web-server (Bot "o'lib qolmasligi" uchun)
 async def handle(request):
     return web.Response(text="Bot ishlamoqda")
 
 async def main():
     init_db()
     
-    # Web serverni ishga tushiramiz (Render uchun shart!)
+    # 1. Web serverni ishga tushiramiz
     app = web.Application()
     app.router.add_get('/', handle)
     runner = web.AppRunner(app)
     await runner.setup()
-    port = int(os.environ.get("PORT", 10000))
-    site = web.TCPSite(runner, '0.0.0.0', port)
+    site = web.TCPSite(runner, '0.0.0.0', PORT)
     await site.start()
     
-    # Botni ishga tushiramiz
+    # 2. Botni ishga tushiramiz
+    await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
